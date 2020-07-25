@@ -9,17 +9,13 @@ Original file is located at
 ##### Copyright 2019 The TensorFlow Authors.
 """
 
-#@title Licensed under the Apache License, Version 2.0 (the "License");
+# @title Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
 # https://www.apache.org/licenses/LICENSE-2.0
 #
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+
 
 """#Improving Computer Vision Accuracy using Convolutions
 
@@ -28,17 +24,20 @@ In the previous lessons you saw how to do fashion recognition using a Deep Neura
 For convenience, here's the entire code again. Run it and take a note of the test accuracy that is printed out at the end.
 """
 
+from tensorflow.keras import models
+import matplotlib.pyplot as plt
 import tensorflow as tf
 mnist = tf.keras.datasets.fashion_mnist
 (training_images, training_labels), (test_images, test_labels) = mnist.load_data()
-training_images=training_images / 255.0
-test_images=test_images / 255.0
+training_images = training_images / 255.0
+test_images = test_images / 255.0
 model = tf.keras.models.Sequential([
-  tf.keras.layers.Flatten(),
-  tf.keras.layers.Dense(128, activation=tf.nn.relu),
-  tf.keras.layers.Dense(10, activation=tf.nn.softmax)
+    tf.keras.layers.Flatten(),
+    tf.keras.layers.Dense(128, activation=tf.nn.relu),
+    tf.keras.layers.Dense(10, activation=tf.nn.softmax)
 ])
-model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=['accuracy'])
+model.compile(optimizer='adam',
+              loss='sparse_categorical_crossentropy', metrics=['accuracy'])
 model.fit(training_images, training_labels, epochs=5)
 print("On test images")
 test_loss = model.evaluate(test_images, test_labels)
@@ -56,24 +55,25 @@ That's the concept of Convolutional Neural Networks. Add some layers to do convo
 Run the below code -- this is the same neural network as earlier, but this time with Convolutional layers added first. It will take longer, but look at the impact on the accuracy:
 """
 
-import tensorflow as tf
 print(tf.__version__)
 mnist = tf.keras.datasets.fashion_mnist
 (training_images, training_labels), (test_images, test_labels) = mnist.load_data()
-training_images=training_images.reshape(60000, 28, 28, 1)
-training_images=training_images / 255.0
+training_images = training_images.reshape(60000, 28, 28, 1)
+training_images = training_images / 255.0
 test_images = test_images.reshape(10000, 28, 28, 1)
-test_images=test_images/255.0
+test_images = test_images/255.0
 model = tf.keras.models.Sequential([
-  tf.keras.layers.Conv2D(64, (3,3), activation='relu', input_shape=(28, 28, 1)),
-  tf.keras.layers.MaxPooling2D(2, 2),
-  tf.keras.layers.Conv2D(64, (3,3), activation='relu'),
-  tf.keras.layers.MaxPooling2D(2,2),
-  tf.keras.layers.Flatten(),
-  tf.keras.layers.Dense(128, activation='relu'),
-  tf.keras.layers.Dense(10, activation='softmax')
+    tf.keras.layers.Conv2D(64, (3, 3), activation='relu',
+                           input_shape=(28, 28, 1)),
+    tf.keras.layers.MaxPooling2D(2, 2),
+    tf.keras.layers.Conv2D(64, (3, 3), activation='relu'),
+    tf.keras.layers.MaxPooling2D(2, 2),
+    tf.keras.layers.Flatten(),
+    tf.keras.layers.Dense(128, activation='relu'),
+    tf.keras.layers.Dense(10, activation='softmax')
 ])
-model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=['accuracy'])
+model.compile(optimizer='adam',
+              loss='sparse_categorical_crossentropy', metrics=['accuracy'])
 model.summary()
 model.fit(training_images, training_labels, epochs=5)
 test_loss = model.evaluate(test_images, test_labels)
@@ -163,25 +163,27 @@ This code will show us the convolutions graphically. The print (test_labels[;100
 
 print(test_labels[:100])
 
-import matplotlib.pyplot as plt
-f, axarr = plt.subplots(3,4)
-FIRST_IMAGE=0
-SECOND_IMAGE=7
-THIRD_IMAGE=26
+f, axarr = plt.subplots(3, 4)
+FIRST_IMAGE = 0
+SECOND_IMAGE = 7
+THIRD_IMAGE = 26
 CONVOLUTION_NUMBER = 1
-from tensorflow.keras import models
 layer_outputs = [layer.output for layer in model.layers]
-activation_model = tf.keras.models.Model(inputs = model.input, outputs = layer_outputs)
-for x in range(0,4):
-  f1 = activation_model.predict(test_images[FIRST_IMAGE].reshape(1, 28, 28, 1))[x]
-  axarr[0,x].imshow(f1[0, : , :, CONVOLUTION_NUMBER], cmap='inferno')
-  axarr[0,x].grid(False)
-  f2 = activation_model.predict(test_images[SECOND_IMAGE].reshape(1, 28, 28, 1))[x]
-  axarr[1,x].imshow(f2[0, : , :, CONVOLUTION_NUMBER], cmap='inferno')
-  axarr[1,x].grid(False)
-  f3 = activation_model.predict(test_images[THIRD_IMAGE].reshape(1, 28, 28, 1))[x]
-  axarr[2,x].imshow(f3[0, : , :, CONVOLUTION_NUMBER], cmap='inferno')
-  axarr[2,x].grid(False)
+activation_model = tf.keras.models.Model(
+    inputs=model.input, outputs=layer_outputs)
+for x in range(0, 4):
+    f1 = activation_model.predict(
+        test_images[FIRST_IMAGE].reshape(1, 28, 28, 1))[x]
+    axarr[0, x].imshow(f1[0, :, :, CONVOLUTION_NUMBER], cmap='inferno')
+    axarr[0, x].grid(False)
+    f2 = activation_model.predict(
+        test_images[SECOND_IMAGE].reshape(1, 28, 28, 1))[x]
+    axarr[1, x].imshow(f2[0, :, :, CONVOLUTION_NUMBER], cmap='inferno')
+    axarr[1, x].grid(False)
+    f3 = activation_model.predict(
+        test_images[THIRD_IMAGE].reshape(1, 28, 28, 1))[x]
+    axarr[2, x].imshow(f3[0, :, :, CONVOLUTION_NUMBER], cmap='inferno')
+    axarr[2, x].grid(False)
 
 """EXERCISES
 
@@ -196,22 +198,23 @@ for x in range(0,4):
 5. In the previous lesson you implemented a callback to check on the loss function and to cancel training once it hit a certain amount. See if you can implement that here!
 """
 
-import tensorflow as tf
 print(tf.__version__)
 mnist = tf.keras.datasets.mnist
 (training_images, training_labels), (test_images, test_labels) = mnist.load_data()
-training_images=training_images.reshape(60000, 28, 28, 1)
-training_images=training_images / 255.0
+training_images = training_images.reshape(60000, 28, 28, 1)
+training_images = training_images / 255.0
 test_images = test_images.reshape(10000, 28, 28, 1)
-test_images=test_images/255.0
+test_images = test_images/255.0
 model = tf.keras.models.Sequential([
-  tf.keras.layers.Conv2D(32, (3,3), activation='relu', input_shape=(28, 28, 1)),
-  tf.keras.layers.MaxPooling2D(2, 2),
-  tf.keras.layers.Flatten(),
-  tf.keras.layers.Dense(128, activation='relu'),
-  tf.keras.layers.Dense(10, activation='softmax')
+    tf.keras.layers.Conv2D(32, (3, 3), activation='relu',
+                           input_shape=(28, 28, 1)),
+    tf.keras.layers.MaxPooling2D(2, 2),
+    tf.keras.layers.Flatten(),
+    tf.keras.layers.Dense(128, activation='relu'),
+    tf.keras.layers.Dense(10, activation='softmax')
 ])
-model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=['accuracy'])
+model.compile(optimizer='adam',
+              loss='sparse_categorical_crossentropy', metrics=['accuracy'])
 model.fit(training_images, training_labels, epochs=10)
 test_loss, test_acc = model.evaluate(test_images, test_labels)
 print(test_acc)
